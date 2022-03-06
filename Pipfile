@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+setuptools = "*"
+pandas = "*"
+xlrd = "==1.2.0"
+fpdf = "*"
+pypdf2 = "*"
+reportlab = "*"
+tk = "*"
+openpyxl = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
