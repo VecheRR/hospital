@@ -5,6 +5,8 @@
 # Results was received on MacBook Pro 13 M1 8Gb
 
 import csv
+import datetime
+
 from functions import functions
 from fpdf import FPDF
 import tkinter as tk
@@ -303,4 +305,4 @@ for i in range(functions.col(csvreader2) - 2):
     print(i)
     all_steps()
 
-pdf.output("simple_demo.pdf")
+pdf.output(f"{datetime.datetime.now()}.pdf")
