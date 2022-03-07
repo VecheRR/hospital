@@ -29,21 +29,40 @@ window = tk.Tk()
 
 
 def g1():
-    text = entry.get(1.0, tk.END).split('\n')[:-1]
+    # text = entry.get(1.0, tk.END).split('\n')[:-1]
+    # #if text[0] == '':
+    #   #  return
+    #
+    # for row in text:
+    #     row = row.split(' = ')
+    #     print(row)
+    #     dic[row[0]] = row[1]
+    #
+    # print(dic)
 
-    for row in text:
-        row = row.split(' = ')
-        print(row)
-        dic[row[0]] = row[1]
+    global t1, t2, t3, t4
+    t1 = entry1.get()
+    t2 = entry2.get()
+    t3 = entry3.get()
+    t4 = entry4.get()
 
-    print(dic)
+    if t1 == '':
+        t1 = '-'
+    if t2 == '':
+        t2 = '-'
+    if t3 == '':
+        t3 = '-'
+    if t4 == '':
+        t4 = '-'
 
     window.destroy()
 
 
-def f2():
-    for key in dic.keys():
-        f(key, dic)
+def f2(dicti):
+    # if len(dicti) == 0:
+    #     return
+    for key in dicti.keys():
+        f(key, dicti)
 
 
 frame1 = tk.Frame(master=window)
@@ -52,13 +71,45 @@ frame1.pack()
 select_csv = tk.Button(master=window, text="CSV", command=select_file)
 select_csv.pack()
 
-entry = tk.Text(master=window, height=20, width=80, font=("Veranda", 24, 'bold'))
-entry.pack()
+# lab = tk.Label(master=window, text="Введите <ключ = значение>")
+# lab.pack()
+
+# entry = tk.Text(master=window, height=10, width=40, font=("Veranda", 24, 'bold'))
+# entry.pack()
+
+lab1 = tk.Label(master=window, text="Юрид лицо направившее материал")
+lab1.pack()
+
+entry1 = tk.Entry(master=window, font=("Veranda", 24, 'bold'))
+entry1.pack()
+
+
+lab2 = tk.Label(master=window, text="Фио врача направившего материал")
+lab2.pack()
+
+entry2 = tk.Entry(master=window, font=("Veranda", 24, 'bold'))
+entry2.pack()
+
+
+lab3 = tk.Label(master=window, text="Отделение")
+lab3.pack()
+
+entry3 = tk.Entry(master=window, font=("Veranda", 24, 'bold'))
+entry3.pack()
+
+
+lab4 = tk.Label(master=window, text="Палата")
+lab4.pack()
+
+entry4 = tk.Entry(master=window, font=("Veranda", 24, 'bold'))
+entry4.pack()
 
 btn = tk.Button(master=window, command=g1, text="Done")
 btn.pack()
 
 window.mainloop()
+
+k = {"Юр лицо напр материал": t1, "Фио врача напр материал": t2, "Отделение": t3, "Палата": t4}
 ########################################################################################
 file = open(filename)
 file2 = open(filename)
@@ -79,6 +130,7 @@ w = 191
 def f(name, d):
     if name == "Пол":
         d[name] = "Мужской" if d[name] == "1" else "Женский"
+
     pdf.x += 10
     tmp = pdf.y
     pdf.multi_cell(60, 5, f'{name}:', align="L", border=0)
@@ -155,9 +207,9 @@ def fill_mid_page():
     g = [d["Адрес факт город"], d["Адрес факт улица"],
          d["Адрес факт дом"], d["Адрес факт строение"], d["Адрес факт квартира"]]
 
-    for i in range(len(g)):
-        if g[i] == '-':
-            g[i] = ''
+    # for i in range(len(g)):
+    #     if g[i] == '-':
+    #         g[i] = ''
 
     text = f'г. {g[0]}, ул. {g[1]}, дом {g[2]}, стр. {g[3]}, квар. {g[4]}'
 
@@ -203,9 +255,19 @@ def fill_bot_page():
     pdf.y = tmp
     pdf.multi_cell(30, 10, f'Не допускается', align="L", border=b)
 
+    ans = ""
+    if rez == "0":
+        ans = "Не обнаружено"
+    if rez == "1":
+        ans = "Обнаружено"
+    if rez == "2":
+        ans = "Сомнительно"
+    if rez == "3":
+        ans = "Брак"
+
     pdf.x += 95
     pdf.y = tmp
-    pdf.multi_cell(30, 10, f'{rez}', align="L", border=b)
+    pdf.multi_cell(30, 10, f'{ans}', align="L", border=b)
 
     pdf.set_font("Times-Roman", size=8)
 
@@ -232,7 +294,8 @@ def all_steps():
     create_page()
     fill_top_page()
     fill_mid_page()
-    f2()
+    f2(k)
+    f2(dic)
     fill_bot_page()
 
 
