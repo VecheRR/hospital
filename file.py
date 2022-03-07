@@ -1,41 +1,84 @@
-# Crated by Vladislav Vecherkosvky. 5 March 2022
+# Created by Vladislav Vecherkovsky.
+# Date: 7.03.2022
+# Code generating 184 PDF-pages for 1.0846281051635742 seconds.
+# It means for 1 PDF-page in average spending 0,005894717963 seconds.
+# Results was received on MacBook Pro 13 M1 8Gb
 
 import csv
 from functions import functions
 from fpdf import FPDF
-from PyPDF2 import PdfFileWriter, PdfFileReader
-import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-import time
+import tkinter as tk
+from tkinter import filedialog as fd
 
-t1 = time.time()
 
-# file = open('src/table.csv')
-file = open('src/test2.csv')
-file2 = open('src/test2.csv')
+def select_file():
+    filetypes = (
+        ('text files', '*.csv')
+    )
+    global filename
+    filename = fd.askopenfilename(
+        title='Open a file',
+        initialdir='/')
 
-# file = open('src/test.xlsx')
+    print(filename)
+    # window.destroy()
 
-# file = functions.xlsx_to_csv("src/table.csv")
+
+dic = {}
+window = tk.Tk()
+
+
+def g1():
+    text = entry.get(1.0, tk.END).split('\n')[:-1]
+
+    for row in text:
+        row = row.split(' = ')
+        print(row)
+        dic[row[0]] = row[1]
+
+    print(dic)
+
+    window.destroy()
+
+
+def f2():
+    for key in dic.keys():
+        f(key, dic)
+
+
+frame1 = tk.Frame(master=window)
+frame1.pack()
+
+select_csv = tk.Button(master=window, text="CSV", command=select_file)
+select_csv.pack()
+
+entry = tk.Text(master=window, height=20, width=80, font=("Veranda", 24, 'bold'))
+entry.pack()
+
+btn = tk.Button(master=window, command=g1, text="Done")
+btn.pack()
+
+window.mainloop()
+########################################################################################
+file = open(filename)
+file2 = open(filename)
+
+print("Получено!")
 
 csvreader = csv.reader(file)
 csvreader2 = csv.reader(file2)
 
-header = functions.get_row(csvreader)
-header[0] = "№ заказа"
-
-# data = functions.get_row(csvreader)
-
 pdf = FPDF()
 
+header = functions.get_row(csvreader)
+header[0] = "№ заказа"
 
 w = 191
 
 
 def f(name, d):
+    if name == "Пол":
+        d[name] = "Мужской" if d[name] == "1" else "Женский"
     pdf.x += 10
     tmp = pdf.y
     pdf.multi_cell(60, 5, f'{name}:', align="L", border=0)
@@ -47,21 +90,25 @@ def f(name, d):
     pdf.line(pdf.x + 10, pdf.y, pdf.x + 175, pdf.y)
 
 
-def all_pdf():
-    data = functions.get_row(csvreader)
+def call_f(sp, d):
+    for el in sp:
+        f(el, d)
 
-    d = dict(zip(header, data))
 
+def create_page():
     pdf.add_page()
     pdf.add_font('Times-Roman', '', 'src/ofont.ru_Times New Roman.ttf', uni=True)
     pdf.add_font('Times-Roman-Bold', '', 'src/BOLDTimes New Roman.ttf', uni=True)
     pdf.set_font("Times-Roman", size=20)
     pdf.set_text_color(0, 0, 0)
 
+
+def fill_top_page():
     pdf.multi_cell(w, 10, txt='ГБУЗ РА «Адыгейская республиканская клиническая инфекционная больница»', align="C")
 
     pdf.set_font("Times-Roman", size=11)
-    pdf.multi_cell(w, 10, 'Юридический адрес: 385017, Республика Адыгея, г. Майкоп, ул. 2-я Короткая, д. 8', align="C")
+    pdf.multi_cell(w, 10, 'Юридический адрес: 385017, Республика Адыгея, г. Майкоп, ул. 2-я Короткая, д. 8',
+                   align="C")
 
     pdf.multi_cell(w, 10, 'Телефон / факс: 8(8772) 54-67-62 / 54-98-85 ОКПО 24441619 ОГРН 1020100708330', align="C")
 
@@ -70,9 +117,16 @@ def all_pdf():
     pdf.multi_cell(w, 10, 'Лицензия «На осущствление медицинской деятельности» от 8.11.2018 № ЛО-01-01-000604',
                    align="C")
 
-    # pdf.multi_cell(w, 10, '', align="C")
 
-    months = {"01": "января", "02": "февраля", "03": "марта", "04": "апреля", "05": "мая", "06": "июня", "07": "июля",
+def fill_mid_page():
+    data = functions.get_row(csvreader)
+    d = dict(zip(header, data))
+
+    global rez
+    rez = d["Результат"]
+
+    months = {"01": "января", "02": "февраля", "03": "марта", "04": "апреля", "05": "мая", "06": "июня",
+              "07": "июля",
               "08": "августа", "09": "сентября", "10": "октября", "11": "ноября", "12": "декабря"}
     date = d["Дата готовности результата"].split('-')
 
@@ -92,9 +146,7 @@ def all_pdf():
 
     pdf.line(pdf.x + 10, pdf.y, pdf.x + 175, pdf.y)
 
-    f('Пол', d)
-
-    f('Дата рождения', d)
+    call_f(['Пол', 'Дата рождения'], d)
 
     pdf.x += 10
     tmp = pdf.y
@@ -115,40 +167,10 @@ def all_pdf():
 
     pdf.line(pdf.x + 10, pdf.y, pdf.x + 175, pdf.y)
 
-    f('Телефон', d)
+    call_f(['Телефон', 'Код услуги', 'Дата заказа', 'Название услуги', 'Тест-система', 'Дата взятия биоматериала', 'Дата готовности результата', 'Тип исследования', 'Значение результата', 'Тип ДУЛ', 'Номер документа', 'Серия документа', 'СНИЛС', 'ОМС'], d)
 
-    # Номер документа;Серия документа;СНИЛС;ОМС;
-    # Дата заказа;Код услуги;Название услуги;Тест-система;Дата взятия б-м;
-    # Дата готовности результата;Результат;Тип исследования;Значение результата;
 
-    f('Код услуги', d)
-
-    f('Дата заказа', d)
-
-    f('Название услуги', d)
-
-    f('Тест-система', d)
-
-    f('Дата взятия биоматериала', d)
-
-    f('Дата готовности результата', d)
-
-    # f('Результат')
-
-    f('Тип исследования', d)
-
-    f('Значение результата', d)
-
-    f('Тип ДУЛ', d)
-
-    f('Номер документа', d)
-
-    f('Серия документа', d)
-
-    f('СНИЛС', d)
-
-    f('ОМС', d)
-
+def fill_bot_page():
     b = 1
     pdf.set_draw_color(150, 150, 150)
     pdf.set_font("Times-Roman-Bold", size=10)
@@ -183,13 +205,14 @@ def all_pdf():
 
     pdf.x += 95
     pdf.y = tmp
-    pdf.multi_cell(30, 10, f'{d["Результат"]}', align="L", border=b)
+    pdf.multi_cell(30, 10, f'{rez}', align="L", border=b)
 
     pdf.set_font("Times-Roman", size=8)
 
     pdf.x += 125
     pdf.y = tmp
-    pdf.multi_cell(40, 2.5, f'Руководство по приминению набора реагентов «АмплиПрайм SARS-CoV-2 DUO»', align="L", border=b)
+    pdf.multi_cell(40, 2.5, f'Руководство по приминению набора реагентов «АмплиПрайм SARS-CoV-2 DUO»', align="L",
+                   border=b)
 
     pdf.set_font("Times-Roman", size=10)
 
@@ -197,17 +220,24 @@ def all_pdf():
     pdf.multi_cell(60, 5, "Сведения о средствах измерения:")
 
     pdf.x += 10
-    pdf.multi_cell(w, 5, "Прибор для проведения полимеразной цепной реакции «QuantStudio5» SN277710568, REF F43321, "
-                         "от 04.01.2021", align="L")
+    pdf.multi_cell(w, 5,
+                   "Прибор для проведения полимеразной цепной реакции «QuantStudio5» SN277710568, REF F43321, "
+                   "от 04.01.2021", align="L")
 
-    pdf.x += 10
-    pdf.multi_cell(w, 5, "Дата проведения исследований: с 05.03.2022 8:35 по 05.03.2022")
+    # pdf.x += 10
+    # pdf.multi_cell(w, 5, "Дата проведения исследований: с 05.03.2022 8:35 по 05.03.2022")
+
+
+def all_steps():
+    create_page()
+    fill_top_page()
+    fill_mid_page()
+    f2()
+    fill_bot_page()
 
 
 for i in range(functions.col(csvreader2) - 2):
     print(i)
-    all_pdf()
+    all_steps()
 
 pdf.output("simple_demo.pdf")
-
-t2 = time.time()

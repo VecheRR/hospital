@@ -15,6 +15,8 @@ def get_row(csvreader):
     # data = list(filter(lambda x: x != "", data))
     data = data[:42]
 
+
+
     for i in range(len(data)):
         if data[i] == '':
             data[i] = '-'
@@ -49,14 +51,30 @@ def xlsx_to_csv(xlsx_name):
 
     for row in data:
         l = list(row)[:38]
+        cnt = 0
         for i in range(len(l)):
+            if l[i].value is None:
+                cnt += 1
             if i == len(l) - 1:
                 csv.write(str(l[i].value))
             else:
                 csv.write(str(l[i].value) + ',')
             csv.write('\n')
+        if cnt == 38:
+            break
 
     # close the csv file
-    csv.close()
+    # csv.close()
 
     return csv
+
+
+def col(reader):
+    len_csv = 0
+    for row in reader:
+        len_csv += 1
+        n = row[0].split(";")
+        if n[0] == "":
+            break
+
+    return len_csv
