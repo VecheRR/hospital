@@ -14,8 +14,7 @@ def get_row(csvreader):
 
     # data = list(filter(lambda x: x != "", data))
     data = data[:42]
-
-
+    # print(data)
 
     for i in range(len(data)):
         if data[i] == '':

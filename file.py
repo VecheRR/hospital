@@ -126,6 +126,11 @@ pdf = FPDF()
 header = functions.get_row(csvreader)
 header[0] = "№ заказа"
 
+# header.append("1")
+# header.append("2")
+# header.append("3")
+# header.append("From")
+
 w = 191
 
 
@@ -175,6 +180,7 @@ def fill_top_page():
 def fill_mid_page():
     data = functions.get_row(csvreader)
     d = dict(zip(header, data))
+    print(d)
 
     global rez
     rez = d["Результат"]
@@ -200,7 +206,11 @@ def fill_mid_page():
 
     pdf.line(pdf.x + 10, pdf.y, pdf.x + 175, pdf.y)
 
-    call_f(['Пол', 'Дата рождения'], d)
+    call_f(['Дата рождения'], d)
+    # print(data[-1])
+
+    dd = {"Юр лицо направившее пробу": data[-1]}
+    f2(dd)
 
     pdf.x += 10
     tmp = pdf.y
@@ -221,7 +231,7 @@ def fill_mid_page():
 
     pdf.line(pdf.x + 10, pdf.y, pdf.x + 175, pdf.y)
 
-    call_f(['Телефон', 'Код услуги', 'Дата заказа', 'Название услуги', 'Тест-система', 'Дата взятия биоматериала', 'Дата готовности результата', 'Тип исследования', 'Значение результата', 'Тип ДУЛ', 'Номер документа', 'Серия документа', 'СНИЛС', 'ОМС'], d)
+    call_f(['Телефон', 'Дата взятия биоматериала', 'Дата готовности результата', 'Тип ДУЛ', 'Номер документа', 'Серия документа', 'СНИЛС', 'ОМС'], d)
 
 
 def fill_bot_page():
@@ -275,7 +285,7 @@ def fill_bot_page():
 
     pdf.x += 125
     pdf.y = tmp
-    pdf.multi_cell(40, 2.5, f'Руководство по приминению набора реагентов «АмплиПрайм SARS-CoV-2 DUO»', align="L",
+    pdf.multi_cell(40, 3.33, f'Руководство по приминению набора реагентов для обнаружения «SARS-CoV-2»', align="L",
                    border=b)
 
     pdf.set_font("Times-Roman", size=10)
@@ -288,9 +298,12 @@ def fill_bot_page():
                    "Прибор для проведения полимеразной цепной реакции «QuantStudio5» SN277710568, REF F43321, "
                    "от 04.01.2021", align="L")
 
-    # pdf.x += 10
-    # pdf.multi_cell(w, 5, "Дата проведения исследований: с 05.03.2022 8:35 по 05.03.2022")
+    pdf.x += 10
+    pdf.multi_cell(w, 5, "Амплификатор детектирующий ДТпрайм 5М1. Заводской номер: А51552. Произовдитель: ООО «НПО ДНК-Технологии»")
 
+    # pdf.x += 10
+    # pdf.multi_cell(w, 5,
+    #                "QuantStudio")
 
 def all_steps():
     create_page()
